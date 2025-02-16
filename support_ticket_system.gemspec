@@ -1,26 +1,19 @@
-require_relative "lib/support_ticket_system/version"
-
 Gem::Specification.new do |spec|
   spec.name        = "support_ticket_system"
-  spec.version     = SupportTicketSystem::VERSION
-  spec.authors     = [ "Chavosh Ramazanian" ]
-  spec.email       = [ "chavosh.ramazanian@buzzjective.com" ]
-  spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of SupportTicketSystem."
-  spec.description = "TODO: Description of SupportTicketSystem."
+  spec.version     = "0.1.0"
+  spec.authors     = [ "Chavosh Ramezanian" ]
+  spec.email       = [ "chavosh99.ra@gmail.com" ]
+  spec.summary     = "A lightweight and extensible support ticket system as a Rails engine."
+  spec.description = "A structured way to handle tickets, assignments, notifications, and workflows—without the overhead of a full-fledged help desk."
+  spec.homepage    = "https://github.com/chav0sh/support_ticket_system"
   spec.license     = "MIT"
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+  spec.files       = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md", "*.gemspec"]
+  spec.require_paths = [ "lib" ]
 
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  # Core Dependencies
+  spec.add_dependency "rails", "~> 8.0.1", "< 8.1"  # Lock Rails to 8.0.x only
 
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
-  end
-
-  spec.add_dependency "rails", ">= 8.0.1"
+  # Active Storage support (required)
+  spec.add_dependency "active_storage_validations"
 end

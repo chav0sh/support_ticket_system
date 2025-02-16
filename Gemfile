@@ -1,16 +1,29 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 # Specify your gem's dependencies in support_ticket_system.gemspec.
 gemspec
 
-gem "puma"
+# Web server
+gem 'puma'
+gem 'pg'
 
-gem "sqlite3"
+group :development, :test do
+  gem 'rubocop'                     # Core RuboCop gem
+  gem 'rubocop-rails'               # RuboCop for Rails best practices
+  gem 'rubocop-performance'         # Performance-related linting
+  gem 'rubocop-minitest'            # Linting for Minitest (optional, if tests use Minitest)
+  gem 'rubocop-rails-omakase', require: false  # Rails Omakase styling
+  gem 'debug', platforms: %i(mri windows), require: 'debug/prelude'
+end
 
-gem "propshaft"
+# Gems required **only for testing**
+group :test do
+  gem 'rspec-rails'               # Testing framework
+  gem 'factory_bot_rails'         # Test data generation
+  gem 'faker'                     # Fake data for tests
+  gem 'shoulda-matchers'          # Matchers for Active Record & Controllers
+  gem 'database_cleaner-active_record'  # Ensures clean test database
+end
 
-# Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-gem "rubocop-rails-omakase", require: false
-
-# Start debugger with binding.b [https://github.com/ruby/debug]
-# gem "debug", ">= 1.0.0"
+# Asset pipeline for Rails 7+
+gem 'propshaft'
