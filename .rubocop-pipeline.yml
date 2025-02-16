@@ -1,16 +1,19 @@
 # Omakase Ruby styling for Rails
 inherit_from: ./.rubocop-rails-omakase.yml
 
+AllCops:
+  Exclude:
+    - "bin/*"
+    - "storage/**/*"
+    - "app/views/**/*"  # No need to lint views
+
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     "%i": "()"
     "%w": "()"
 
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-
-Style/HashSyntax:
-  EnforcedShorthandSyntax: always
-
 Metrics/MethodLength:
   CountAsOne: ['array', 'heredoc', 'hash']
+
+Style/StringLiterals:
+  Enabled: false
