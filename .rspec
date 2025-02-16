@@ -1,0 +1,7 @@
+--default_path ./test/dummy/spec
+--require rails_helper
+--color
+--format progress
+--format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
+--format RspecJunitFormatter
+--out tmp/rspec<%= ENV["TEST_ENV_NUMBER"] %>.xml
