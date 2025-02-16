@@ -85,7 +85,11 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    annotate (2.6.5)
+      activerecord (>= 2.3.0)
+      rake (>= 0.8.7)
     ast (2.4.2)
+    backport (1.2.0)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
@@ -102,6 +106,10 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.6.0)
+    dotenv (3.1.7)
+    dotenv-rails (3.1.7)
+      dotenv (= 3.1.7)
+      railties (>= 6.1)
     drb (2.2.1)
     erubi (1.13.1)
     factory_bot (6.5.1)
@@ -120,7 +128,12 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    jaro_winkler (1.6.0)
     json (2.10.1)
+    kramdown (2.5.1)
+      rexml (>= 3.3.9)
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     language_server-protocol (3.17.0.4)
     lint_roller (1.1.0)
     logger (1.6.6)
@@ -161,7 +174,11 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.2-x86_64-linux-musl)
       racc (~> 1.4)
+    observer (0.1.2)
+    ostruct (0.6.1)
     parallel (1.26.3)
+    parallel_tests (4.9.0)
+      parallel
     parser (3.3.7.1)
       ast (~> 2.4.1)
       racc
@@ -219,11 +236,16 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
+    rbs (3.8.1)
+      logger
     rdoc (6.12.0)
       psych (>= 4.0.0)
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
+    reverse_markdown (3.0.0)
+      nokogiri
+    rexml (3.4.0)
     rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.3)
@@ -241,6 +263,8 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.2)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.72.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -277,8 +301,27 @@ GEM
     securerandom (0.4.1)
     shoulda-matchers (6.4.0)
       activesupport (>= 5.2.0)
+    solargraph (0.51.2)
+      backport (~> 1.2)
+      benchmark
+      bundler (~> 2.0)
+      diff-lcs (~> 1.4)
+      jaro_winkler (~> 1.6)
+      kramdown (~> 2.3)
+      kramdown-parser-gfm (~> 1.1)
+      logger (~> 1.6)
+      observer (~> 0.1)
+      ostruct (~> 0.6)
+      parser (~> 3.0)
+      rbs (~> 3.0)
+      reverse_markdown (>= 2.0, < 4)
+      rubocop (~> 1.38)
+      thor (~> 1.0)
+      tilt (~> 2.0)
+      yard (~> 0.9, >= 0.9.24)
     stringio (3.1.3)
     thor (1.3.2)
+    tilt (2.6.0)
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -291,6 +334,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yard (0.9.37)
     zeitwerk (2.7.1)
 
 PLATFORMS
@@ -304,21 +348,29 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  annotate
   database_cleaner-active_record
   debug
+  dotenv-rails
   factory_bot_rails
   faker
+  parallel_tests
   pg
   propshaft
   puma
   rspec-rails
+  rspec_junit_formatter
   rubocop
   rubocop-minitest
   rubocop-performance
   rubocop-rails
   rubocop-rails-omakase
   shoulda-matchers
+  solargraph
   support_ticket_system!
+
+RUBY VERSION
+   ruby 3.4.1p0
 
 BUNDLED WITH
    2.6.3
