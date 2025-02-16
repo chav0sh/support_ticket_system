@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = [ "lib" ]
 
   # Core Dependencies
+  spec.required_ruby_version = '>= 3.4.1'
   spec.add_dependency "rails", "~> 8.0.1", "< 8.1"  # Lock Rails to 8.0.x only
 
   # Active Storage support (required)
