@@ -18,8 +18,14 @@ jobs:
           ruby-version: 3.4.1
           bundler-cache: true
 
-      - name: Lint code for consistent style
-        run: bundle exec rubocop -f github
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run Overcommit
+        run: |
+          bundle exec overcommit --sign
+          bundle exec overcommit --sign pre-commit
+          SKIP=AuthorName,AuthorEmail bundle exec overcommit --run
 
   test:
     runs-on: ubuntu-latest
@@ -39,7 +45,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Install dependencies
+      - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git pkg-config google-chrome-stable
 
       - name: Checkout code
