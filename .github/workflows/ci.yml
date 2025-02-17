@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-  pull_request: 
+  pull_request:
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.1
-          bundler-cache: true 
+          bundler-cache: true
 
       - name: Install dependencies
         run: bundle install
@@ -35,7 +35,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.1
-          bundler-cache: true 
+          bundler-cache: true
 
       - name: Install dependencies
         run: bundle install && bundle show
@@ -60,6 +60,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      DATABASE_URL: postgres://runner:123123@postgres:5432/support_ticket_system_test
       DB_HOST: postgres
       DB_PORT: 5432
       POSTGRES_DB: support_ticket_system_test
@@ -74,13 +75,4 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.1
-          bundler-cache: true
-
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Set up database
-        run: RAILS_ENV=test bundle exec rake db:create db:schema:load
-
-      - name: Run tests
-        run: bundle exec rspec test/dummy/spec
+          bundler-cache: tru
