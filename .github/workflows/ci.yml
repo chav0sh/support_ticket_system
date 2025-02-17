@@ -8,9 +8,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    variables:
+    env:
       RAILS_ENV: test
-      NODE_ENV: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,6 +24,8 @@ jobs:
         run: bundle install
 
       - name: Run Overcommit
+        env:
+          RAILS_ENV: test
         run: |
           bundle exec overcommit --sign
           bundle exec overcommit --sign pre-commit
