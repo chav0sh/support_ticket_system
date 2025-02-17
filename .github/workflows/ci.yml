@@ -60,7 +60,6 @@ jobs:
 
     env:
       RAILS_ENV: test
-      DB_HOST: postgres
       DB_PORT: 5432
       POSTGRES_DB: support_ticket_system_test
       POSTGRES_USER: runner
