@@ -55,12 +55,9 @@ jobs:
           POSTGRES_DB: support_ticket_system_test
           POSTGRES_USER: runner
           POSTGRES_PASSWORD: "123123"
-        ports:
-          - 5432:5432
 
     env:
       RAILS_ENV: test
-      DB_PORT: 5432
       POSTGRES_DB: support_ticket_system_test
       POSTGRES_USER: runner
       POSTGRES_PASSWORD: "123123"
