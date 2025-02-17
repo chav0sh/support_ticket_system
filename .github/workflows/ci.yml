@@ -57,6 +57,11 @@ jobs:
           POSTGRES_PASSWORD: "123123"
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U runner -d support_ticket_system_test"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 10
 
     env:
       RAILS_ENV: test
@@ -80,15 +85,21 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
-      - name: List Running Containers
-        run: docker ps -a  # ✅ Debugging: Show running services
+      - name: 🔍 Debug Running Containers
+        run: docker ps -a  # ✅ Check if PostgreSQL is actually running
 
-      - name: Wait for PostgreSQL to become ready
+      - name: 🔍 Show PostgreSQL Logs
+        run: docker logs $(docker ps -q --filter ancestor=postgres) || echo "⚠️ No logs available"
+
+      - name: 🔍 Wait for PostgreSQL to become ready
         run: |
           for i in {1..20}; do
             pg_isready -h postgres -p 5432 -U runner && exit 0 || (echo "⏳ Waiting for PostgreSQL... Attempt $i" && sleep 3)
           done
           echo "❌ PostgreSQL did not start in time" && exit 1
+
+      - name: 🔍 Check PostgreSQL Port
+        run: netstat -an | grep 5432 || echo "⚠️ Port 5432 is NOT open"
 
       - name: Set up database
         run: RAILS_ENV=test bundle exec rake db:create db:schema:load
