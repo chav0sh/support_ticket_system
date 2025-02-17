@@ -6,7 +6,7 @@ services:
 variables:
   RAILS_ENV: test
   RACK_ENV: test
-  POSTGRES_DB: approval_system_test
+  POSTGRES_DB: support_ticket_system_test
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "123123"
 

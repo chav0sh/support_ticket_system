@@ -8,6 +8,9 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    variables:
+      RAILS_ENV: test
+      NODE_ENV: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,13 +36,15 @@ jobs:
       postgres:
         image: postgres:16.7-alpine
         env:
-          POSTGRES_DB: approval_system_test
+          RAILS_ENV: test
+          RACK_ENV: test
+          POSTGRES_DB: support_ticket_system_test
           POSTGRES_USER: runner
           POSTGRES_PASSWORD: "123123"
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U runner -d approval_system_test"
+          --health-cmd "pg_isready -U runner -d support_ticket_system_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -66,8 +71,8 @@ jobs:
       - name: Set up database
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://runner:123123@localhost:5432/approval_system_test
-        run: bin/rails db:create db:schema:load
+          DATABASE_URL: postgres://runner:123123@localhost:5432/support_ticket_system_test
+        run: RAILS_ENV=test bundle exec rake db:create db:schema:load
 
       - name: Run tests
         env:
