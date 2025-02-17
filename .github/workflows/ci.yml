@@ -19,19 +19,27 @@ jobs:
           bundler-cache: true
 
       - name: Lint code for consistent style
-        run: bin/rubocop -f github
+        run: bundle exec rubocop -f github
 
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.7-alpine
+        env:
+          POSTGRES_DB: approval_system_test
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: "123123"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U runner -d approval_system_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-    # services:
-    #  redis:
-    #    image: redis
-    #    ports:
-    #      - 6379:6379
-    #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Install packages
+      - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git pkg-config google-chrome-stable
 
       - name: Checkout code
@@ -43,11 +51,22 @@ jobs:
           ruby-version: 3.4.1
           bundler-cache: true
 
+      - name: Wait for PostgreSQL to become ready
+        run: sleep 10
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Set up database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://runner:123123@localhost:5432/approval_system_test
+        run: bin/rails db:create db:schema:load
+
       - name: Run tests
         env:
           RAILS_ENV: test
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test
+        run: bundle exec rspec test/dummy/spec
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
@@ -56,4 +75,3 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
-
