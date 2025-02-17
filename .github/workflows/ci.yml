@@ -1,57 +1,86 @@
-image: ruby:3.4.1
+name: CI
 
-services:
-  - postgres:16.7-alpine
+on:
+  push:
+  pull_request: 
 
-variables:
-  RAILS_ENV: test
-  RACK_ENV: test
-  POSTGRES_DB: support_ticket_system_test
-  POSTGRES_USER: runner
-  POSTGRES_PASSWORD: "123123"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-stages:
-  - build
-  - linter
-  - test
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true 
 
-build_job:
-  stage: build
-  script:
-    - bundle install
-  except:
-    - main
-    - tags
-  tags:
-    - develop
+      - name: Install dependencies
+        run: bundle install
 
-linter_job:
-  stage: linter
-  variables:
-    RAILS_ENV: test
-    NODE_ENV: test
-  before_script:
-    - ruby -v
-    - bundler -v
-    - bundle install && bundle show
-  script:
-    - bundle exec overcommit --sign
-    - bundle exec overcommit --sign pre-commit
-    - SKIP=AuthorName,AuthorEmail bundle exec overcommit --run
-  except:
-    - main
-    - tags
-  tags:
-    - develop
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-test_job:
-  stage: test
-  script:
-    - bundle install
-    - RAILS_ENV=test bundle exec rake db:create db:schema:load
-    - bundle exec rspec test/dummy/spec
-  except:
-    - main
-    - tags
-  tags:
-    - develop
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true 
+
+      - name: Install dependencies
+        run: bundle install && bundle show
+
+      - name: Run Overcommit
+        run: |
+          bundle exec overcommit --sign
+          bundle exec overcommit --sign pre-commit
+          SKIP=AuthorName,AuthorEmail bundle exec overcommit --run
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.7-alpine
+        env:
+          POSTGRES_DB: support_ticket_system_test
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: "123123"
+        ports:
+          - 5432:5432
+
+    env:
+      RAILS_ENV: test
+      DB_HOST: postgres
+      DB_PORT: 5432
+      POSTGRES_DB: support_ticket_system_test
+      POSTGRES_USER: runner
+      POSTGRES_PASSWORD: "123123"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Set up database
+        run: RAILS_ENV=test bundle exec rake db:create db:schema:load
+
+      - name: Run tests
+        run: bundle exec rspec test/dummy/spec
