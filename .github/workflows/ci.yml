@@ -1,12 +1,11 @@
 name: CI
 
 on:
-  pull_request:
   push:
-    branches: [ main ]
+  pull_request:
 
 jobs:
-  lint:
+  build:
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
@@ -23,9 +22,25 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install && bundle show
+
       - name: Run Overcommit
-        env:
-          RAILS_ENV: test
         run: |
           bundle exec overcommit --sign
           bundle exec overcommit --sign pre-commit
@@ -37,8 +52,6 @@ jobs:
       postgres:
         image: postgres:16.7-alpine
         env:
-          RAILS_ENV: test
-          RACK_ENV: test
           POSTGRES_DB: support_ticket_system_test
           POSTGRES_USER: runner
           POSTGRES_PASSWORD: "123123"
@@ -50,10 +63,16 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    steps:
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git pkg-config google-chrome-stable
+    env:
+      RAILS_ENV: test
+      DB_HOST: postgres
+      DB_PORT: 5432
+      POSTGRES_DB: support_ticket_system_test
+      POSTGRES_USER: runner
+      POSTGRES_PASSWORD: "123123"
+      DB_POOL: 5 
 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -63,27 +82,18 @@ jobs:
           ruby-version: 3.4.1
           bundler-cache: true
 
-      - name: Wait for PostgreSQL to become ready
-        run: sleep 10
-
       - name: Install dependencies
         run: bundle install
 
+      - name: Wait for PostgreSQL to become ready
+        run: |
+          for i in {1..10}; do
+            pg_isready -h postgres -p 5432 -U runner && exit 0 || sleep 2
+          done
+          exit 1
+
       - name: Set up database
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: postgres://runner:123123@localhost:5432/support_ticket_system_test
-        run: RAILS_ENV=test bundle exec rake db:create db:schema:load
+        run: bundle exec rake db:create db:schema:load
 
       - name: Run tests
-        env:
-          RAILS_ENV: test
         run: bundle exec rspec test/dummy/spec
-
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore
