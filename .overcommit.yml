@@ -1,0 +1,45 @@
+# Use this file to configure the Overcommit hooks you wish to use. This will
+# extend the default configuration defined in:
+# https://github.com/sds/overcommit/blob/master/config/default.yml
+
+PreCommit:
+  ALL:
+    on_warn: fail
+
+  # Not required because it's not needed/sensible in a CI context.
+  AuthorEmail:
+    enabled: true
+    required: false
+
+  # Not required because it's not needed/sensible in a CI context.
+  AuthorName:
+    enabled: true
+    required: false
+
+  BundleCheck:
+    description: 'Check if local Gemfile.lock matches Gemfile when either changes.'
+    enabled: true
+
+  BundleAudit:
+    description: 'Checks for vulnerable versions of gems in Gemfile.lock.'
+    enabled: true
+    command: ['bundle', 'exec', 'bundle-audit', 'check']
+    flags: ['--update']
+
+  LicenseFinder:
+    enabled: false
+    # description: 'Analyze with LicenseFinder.'
+    # command: ['bundle', 'exec', 'license_finder', '--enabled-package-managers=bundler']
+
+  RuboCop:
+    enabled: true
+    command: ['bundle', 'exec', 'rubocop', '-c', './.rubocop-pipeline.yml']
+
+  Fasterer:
+    enabled: true
+    command: ['bundle', 'exec', 'fasterer']
+
+  Brakeman:
+    enabled: true
+    command: ['brakeman']
+    flags: ['-A']
