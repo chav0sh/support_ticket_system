@@ -75,4 +75,4 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.1
-          bundler-cache: tru
+          bundler-cache: true
