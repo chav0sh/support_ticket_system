@@ -5,6 +5,47 @@ on:
   pull_request:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install
+
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: bundle install && bundle show
+
+      - name: Run Overcommit
+        run: |
+          bundle exec overcommit --sign
+          bundle exec overcommit --sign pre-commit
+          SKIP=AuthorName,AuthorEmail bundle exec overcommit --run
+
   test:
     runs-on: ubuntu-latest
     services:
@@ -14,19 +55,13 @@ jobs:
           POSTGRES_DB: support_ticket_system_test
           POSTGRES_USER: runner
           POSTGRES_PASSWORD: "123123"
-          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U runner -h 127.0.0.1"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 10
 
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://runner:123123@127.0.0.1:5432/support_ticket_system_test  # ✅ Use IP address
-      DB_HOST: 127.0.0.1  # ✅ Change from `postgres` to `localhost`
+      DATABASE_URL: postgres://runner:123123@127.0.0.1:5432/support_ticket_system_test
+      DB_HOST: 127.0.0.1
       DB_PORT: 5432
       POSTGRES_DB: support_ticket_system_test
       POSTGRES_USER: runner
@@ -44,22 +79,6 @@ jobs:
 
       - name: Install dependencies
         run: bundle install
-
-      - name: 🔍 Debug Running Containers
-        run: docker ps -a
-
-      - name: 🔍 Show PostgreSQL Logs
-        run: docker logs $(docker ps -q --filter ancestor=postgres) || echo "⚠️ No logs available"
-
-      - name: 🔍 Wait for PostgreSQL to become ready
-        run: |
-          for i in {1..20}; do
-            pg_isready -h 127.0.0.1 -p 5432 -U runner && exit 0 || (echo "⏳ Waiting for PostgreSQL... Attempt $i" && sleep 3)
-          done
-          echo "❌ PostgreSQL did not start in time" && exit 1
-
-      - name: 🔍 Check PostgreSQL Port
-        run: netstat -an | grep 5432 || echo "⚠️ Port 5432 is NOT open"
 
       - name: Set up database
         run: RAILS_ENV=test bundle exec rake db:create db:schema:load
